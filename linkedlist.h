@@ -7,6 +7,17 @@
 #ifndef __LINKED_LIST_H__
 #define __LINKED_LIST_H__
 
+/*
+    * This directive conditional assure functions that have return cannot be ignored.
+    * This helps to avoid memory leaks caused by negligence from programmer.
+    * Unfortunately, this is only available for GNU C Compiler (GCC) Users for now.
+    * There is an open improvement to make this available for other Compilers:
+    * See the discussion at: https://github.com/Rafael-monteiro-zancanaro/c-data-structures/issues/2
+*/
+#ifndef __GNUC__
+    #define __attribute__(x) /*NOTHING*/
+#endif
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -368,7 +379,7 @@ void InsertAt(struct LinkedList_t *list, size_t position, void *value)
 
     * Other Details
     *   Time Complexity: O(n)
-    *   'warn_unused_result' flag: Return can't be ignored
+    *   For GNU C Compiler (GCC) Users: 'warn_unused_result' flag. Return can't be ignored
 */
 __attribute__((warn_unused_result)) struct Cell_t* GetAt(struct LinkedList_t *list, size_t position)
 {
@@ -413,7 +424,7 @@ __attribute__((warn_unused_result)) struct Cell_t* GetAt(struct LinkedList_t *li
 
     * Other Details
     *   Time Complexity: O(n)
-    *   'warn_unused_result' flag: Return can't be ignored
+    *   For GNU C Compiler (GCC) Users: 'warn_unused_result' flag. Return can't be ignored
 */
 __attribute__((warn_unused_result)) struct LinkedList_t* Reserve(size_t positions)
 {
@@ -438,7 +449,7 @@ __attribute__((warn_unused_result)) struct LinkedList_t* Reserve(size_t position
 
     * Other Details
     *   Time Complexity: O(n)
-    *   'warn_unused_result' flag: Return can't be ignored
+    *   For GNU C Compiler (GCC) Users: 'warn_unused_result' flag. Return can't be ignored
 */
 __attribute__((warn_unused_result)) struct LinkedList_t* DryNulls(struct LinkedList_t *list)
 {
@@ -463,7 +474,7 @@ __attribute__((warn_unused_result)) struct LinkedList_t* DryNulls(struct LinkedL
     
     * Other Details:
     *   Time Complexity: Θ(1)
-    *   'warn_unused_result' flag: Return can't be ignored
+    *   For GNU C Compiler (GCC) Users: 'warn_unused_result' flag. Return can't be ignored
 */
 __attribute__((warn_unused_result)) struct Cell_t* RetrieveFront(struct LinkedList_t *list)
 {
@@ -489,7 +500,7 @@ __attribute__((warn_unused_result)) struct Cell_t* RetrieveFront(struct LinkedLi
     
     * Other Details:
     *   Time Complexity: Θ(n)
-    *   'warn_unused_result' flag: Return can't be ignored
+    *   For GNU C Compiler (GCC) Users: 'warn_unused_result' flag. Return can't be ignored
 */
 __attribute__((warn_unused_result)) struct Cell_t* RetrieveBack(struct LinkedList_t *list)
 {
