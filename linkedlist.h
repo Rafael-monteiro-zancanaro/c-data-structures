@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <limits.h>
 
 
 /*
@@ -20,6 +21,17 @@
 */
 #define WARNINGS_ALLOWED false
 
+/*
+    * LIST_HEAD: Directive that represents the first element of list
+*/
+#define LIST_HEAD 0
+
+/*
+    * LIST_TAIL: Directive that represents the last element of list
+
+    * This attribute is checked inside handling functions and replaced by the current size of list.
+*/
+#define LIST_TAIL INT64_MAX
 
 /*
     * Cell_t: The list cell type
@@ -123,7 +135,6 @@ void Pprint(struct LinkedList_t *list)
         ++counter.currentPosition;
     }
 }
-
 
 /*
     * Empty: Check if a list doesnt contains elements
@@ -255,6 +266,10 @@ void Free(struct LinkedList_t *list)
 */
 void RemoveAt(struct LinkedList_t *list, size_t position)
 {
+    if (position == LIST_TAIL) {
+        position = list->currentSize - 1;
+    }
+
     if (Empty(list)) {
         #if WARNINGS_ALLOWED
             char warn[100] = "\0";
@@ -298,6 +313,10 @@ void RemoveAt(struct LinkedList_t *list, size_t position)
 */
 void InsertAt(struct LinkedList_t *list, size_t position, void *value)
 {
+    if (position == LIST_TAIL) {
+        position = list->currentSize - 1;
+    }
+
     struct Cell_t *currentCell = (struct Cell_t *)malloc(sizeof(struct Cell_t));
     currentCell->value = value;
     currentCell->next = NULL;
@@ -349,11 +368,15 @@ void InsertAt(struct LinkedList_t *list, size_t position, void *value)
 
     * Other Details
     *   Time Complexity: O(n)
+    *   'warn_unused_result' flag: Return can't be ignored
 */
-struct Cell_t* GetAt(struct LinkedList_t *list, size_t position)
+__attribute__((warn_unused_result)) struct Cell_t* GetAt(struct LinkedList_t *list, size_t position)
 {
-    if (position < 0 || position > list->currentSize - 1)
-    {
+    if (position == LIST_TAIL) {
+        position = list->currentSize - 1;
+    }
+
+    if (position < 0 || position > list->currentSize - 1) {
         #if WARNINGS_ALLOWED
             char warn[100] = "\0";
             sprintf(warn, "Warning: Tried to get on invalid index (%ld)", position);
@@ -390,8 +413,9 @@ struct Cell_t* GetAt(struct LinkedList_t *list, size_t position)
 
     * Other Details
     *   Time Complexity: O(n)
+    *   'warn_unused_result' flag: Return can't be ignored
 */
-struct LinkedList_t* Reserve(size_t positions)
+__attribute__((warn_unused_result)) struct LinkedList_t* Reserve(size_t positions)
 {
     struct LinkedList_t *list = (struct LinkedList_t *) malloc(sizeof(struct LinkedList_t));
     list->head = (struct Cell_t *) malloc(sizeof(struct Cell_t));
@@ -414,8 +438,9 @@ struct LinkedList_t* Reserve(size_t positions)
 
     * Other Details
     *   Time Complexity: O(n)
+    *   'warn_unused_result' flag: Return can't be ignored
 */
-struct LinkedList_t* DryNulls(struct LinkedList_t *list)
+__attribute__((warn_unused_result)) struct LinkedList_t* DryNulls(struct LinkedList_t *list)
 {
     struct __Aux_Counter counter = {.currentPosition = 0, .pivot = list->head};
     struct LinkedList_t *newList = (struct LinkedList_t *) malloc(sizeof(struct LinkedList_t)); 
@@ -428,6 +453,65 @@ struct LinkedList_t* DryNulls(struct LinkedList_t *list)
     }
     Free(list);
     return newList;
+}
+
+/*
+    * RetrieveFront: Get the First Element of List
+
+    * This method unbinds the first element from the Linked List, so
+    * if you want to just access it, use GetAt(list, LIST_HEAD) (See 'GetAt' for more details)
+    
+    * Other Details:
+    *   Time Complexity: Θ(1)
+    *   'warn_unused_result' flag: Return can't be ignored
+*/
+__attribute__((warn_unused_result)) struct Cell_t* RetrieveFront(struct LinkedList_t *list)
+{
+    if (Empty(list)) {
+        #if WARNINGS_ALLOWED
+            Warning("Tried to retrieve from empty list.");
+        #endif
+        return NULL;
+    }
+
+    Cell_t *firstCell = list->head;
+    list->head = list->head->next;
+    firstCell->next = NULL;
+    list->currentSize--;
+    return firstCell;
+}
+
+/*
+    * RetrieveBack: Get the Last Element of List
+
+    * This method unbinds the last element from the Linked List, so
+    * if you want to just access it, use GetAt(list, LIST_TAIL) (See 'GetAt' for more details)
+    
+    * Other Details:
+    *   Time Complexity: Θ(n)
+    *   'warn_unused_result' flag: Return can't be ignored
+*/
+__attribute__((warn_unused_result)) struct Cell_t* RetrieveBack(struct LinkedList_t *list)
+{
+    if (Empty(list)) {
+        #if WARNINGS_ALLOWED
+            Warning("Tried to retrieve from empty list.");
+        #endif
+        return NULL;
+    }
+    struct Cell_t *beforeTarget = NULL;
+    struct __Aux_Counter counter = {.currentPosition = 0, .pivot = list->head};
+
+    while (counter.pivot->next != NULL) {
+        beforeTarget = counter.pivot;
+        counter.pivot = counter.pivot->next;
+        ++counter.currentPosition;
+    }
+
+    beforeTarget->next = NULL;
+    counter.pivot->next = NULL;
+    list->currentSize--;
+    return counter.pivot;
 }
 
 #endif //__LINKED_LIST_H__
