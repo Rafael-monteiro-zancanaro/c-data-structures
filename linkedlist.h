@@ -22,7 +22,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <limits.h>
 
 
 /*
@@ -51,7 +50,7 @@
     * i.e: Consider the following representation of Cell
     * 
     * int someValue = 5;
-    * Cell_t nextCell = ... ;// Some intialization here
+    * Cell_t nextCell = ... ;// Some initialization here
     * Cell_t current = {
     *   .value = &someValue,
     *   .next = &nextCell;
@@ -80,10 +79,10 @@ typedef struct LinkedList_t
 } LinkedList_t;
 
 /*
-    * __Aux_Counter: Utilitary Internal Counter for loops
+    * __Aux_Counter: Utility Internal Counter for loops
 
-    * You dont need to use this on your custom functions, 
-    * it is used as a internal facility to improve/maintain the functions of this header 
+    * You don't need to use this on your custom functions,
+    * it is used as an internal facility to improve/maintain the functions of this header
 */
 struct __Aux_Counter
 {
@@ -100,7 +99,7 @@ struct __Aux_Counter
     * Other details:
     *   Time complexity: O(1)
 */
-void Warning(const char *message)
+inline void Warning(const char *message)
 {
     fprintf(stderr, "Warning: %s.\n", message);
     fprintf(stdout, "If you want to disable warning messages, set WARNINGS_ALLOWED as false\n");
@@ -110,7 +109,7 @@ void Warning(const char *message)
     * Pprint: Print the list data on stdout
 
     * It runs all over the list printing the values.
-    * Its important to say that the 'values' described here are the POINTER addresses.
+    * It's important to say that the 'values' described here are the POINTER addresses.
     * i.e, Considering the following code:
     * 
     * int value1, value2, value3 = 2;
@@ -129,7 +128,7 @@ void Warning(const char *message)
     * Other Details:
     *   Time Complexity: Θ(n) 
 */
-void Pprint(struct LinkedList_t *list)
+inline void Pprint(const struct LinkedList_t *list)
 {
     struct __Aux_Counter counter = {.currentPosition = 0, .pivot = list->head};
     printf("List size: %d\n", list->currentSize);
@@ -148,7 +147,7 @@ void Pprint(struct LinkedList_t *list)
 }
 
 /*
-    * Empty: Check if a list doesnt contains elements
+    * Empty: Check if a list doesn't contain elements
 
     * This verification checks if HEAD is NULL and if currentSize size is NULL
     * so be careful when change lists internal data, especially on this second value
@@ -156,7 +155,7 @@ void Pprint(struct LinkedList_t *list)
     * Other Details:
     *   Time Complexity: Θ(1)
 */
-bool Empty(struct LinkedList_t *list)
+inline bool Empty(const struct LinkedList_t *list)
 {
     return list->head == NULL && list->currentSize == 0;
 }
@@ -170,8 +169,10 @@ bool Empty(struct LinkedList_t *list)
     * Other Details
     *   Time Complexity: O(n)
 */
-void PushBack(struct LinkedList_t *list, void *value)
+inline void PushBack(struct LinkedList_t *list, void *value)
 {
+    if (list == NULL) return;
+
     struct Cell_t *currentCell = (struct Cell_t *)malloc(sizeof(struct Cell_t));
     currentCell->value = value;
     currentCell->next = NULL;
@@ -211,7 +212,7 @@ void PushBack(struct LinkedList_t *list, void *value)
     * Other Details
     *   Time Complexity: Θ(1)
 */
-void PushFront(struct LinkedList_t *list, void *value)
+inline void PushFront(struct LinkedList_t *list, void *value)
 {
     struct Cell_t *currentCell = (struct Cell_t *)malloc(sizeof(struct Cell_t));
     currentCell->value = value;
@@ -241,14 +242,14 @@ void PushFront(struct LinkedList_t *list, void *value)
 /*
     * Free: Deallocate list resources
 
-    * This method runs over all list cells and freeds they and the list itself after it.
+    * This method runs over all list cells and freed they and the list itself after it.
     * Is very recommendable to Free a list after use it or in the end of 
     * its scope to prevent memory leaks. 
  
     * Other Details
     *   Time Complexity: Θ(n)
 */
-void Free(struct LinkedList_t *list)
+inline void Free(struct LinkedList_t *list)
 {
     if (list->head == NULL) {
         free(list);
@@ -269,13 +270,13 @@ void Free(struct LinkedList_t *list)
     * RemoveAt: Remove element on desired position
 
     * This method runs over the Cells until the internal counter be equal to the desired position.
-    * It is best-effort algorithm, this means it will not break the execution if abnormal circustances happen,
-    * like removal of empty list or a invalid index. Instead of this, it will make nothing.
+    * It is best-effort algorithm, this means it will not break the execution if abnormal circumstances happen,
+    * like removal of empty list or an invalid index. Instead of this, it will make nothing.
  
     * Other Details
     *   Time Complexity: O(n)
 */
-void RemoveAt(struct LinkedList_t *list, size_t position)
+inline void RemoveAt(const struct LinkedList_t *list, size_t position)
 {
     if (position == LIST_TAIL) {
         position = list->currentSize - 1;
@@ -307,6 +308,9 @@ void RemoveAt(struct LinkedList_t *list, size_t position)
         counter.pivot = counter.pivot->next;
         ++counter.currentPosition;
     }
+
+    if (beforeTarget == NULL) return;
+
     afterTarget = counter.pivot->next;
     beforeTarget->next = afterTarget;
     free(counter.pivot);
@@ -316,13 +320,13 @@ void RemoveAt(struct LinkedList_t *list, size_t position)
     * RemoveAt: Insert element on desired position
 
     * This method runs over the Cells until the internal counter be equal to the desired position.
-    * It is best-effort algorithm, this means it will not break the execution if abnormal circustances happen,
-    * like a invalid index. Instead of this, it will make nothing.
+    * It is best-effort algorithm, this means it will not break the execution if abnormal circumstances happen,
+    * like an invalid index. Instead of this, it will make nothing.
  
     * Other Details
     *   Time Complexity: O(n)
 */
-void InsertAt(struct LinkedList_t *list, size_t position, void *value)
+inline void InsertAt(struct LinkedList_t *list, size_t position, void *value)
 {
     if (position == LIST_TAIL) {
         position = list->currentSize - 1;
@@ -365,6 +369,9 @@ void InsertAt(struct LinkedList_t *list, size_t position, void *value)
         counter.pivot = counter.pivot->next;
         ++counter.currentPosition;
     }
+
+    if (beforeTarget == NULL) return;
+
     beforeTarget->next = currentCell;
     currentCell->next = counter.pivot;
     list->currentSize++;
@@ -381,7 +388,7 @@ void InsertAt(struct LinkedList_t *list, size_t position, void *value)
     *   Time Complexity: O(n)
     *   For GNU C Compiler (GCC) Users: 'warn_unused_result' flag. Return can't be ignored
 */
-__attribute__((warn_unused_result)) struct Cell_t* GetAt(struct LinkedList_t *list, size_t position)
+__attribute__((warn_unused_result)) inline struct Cell_t* GetAt(const struct LinkedList_t *list, size_t position)
 {
     if (position == LIST_TAIL) {
         position = list->currentSize - 1;
@@ -426,7 +433,7 @@ __attribute__((warn_unused_result)) struct Cell_t* GetAt(struct LinkedList_t *li
     *   Time Complexity: O(n)
     *   For GNU C Compiler (GCC) Users: 'warn_unused_result' flag. Return can't be ignored
 */
-__attribute__((warn_unused_result)) struct LinkedList_t* Reserve(size_t positions)
+__attribute__((warn_unused_result)) inline struct LinkedList_t* Reserve(size_t positions)
 {
     struct LinkedList_t *list = (struct LinkedList_t *) malloc(sizeof(struct LinkedList_t));
     list->head = (struct Cell_t *) malloc(sizeof(struct Cell_t));
@@ -444,14 +451,14 @@ __attribute__((warn_unused_result)) struct LinkedList_t* Reserve(size_t position
 /*
     * DryNulls: Remove NULL value cells from list
 
-    * This method removes all Cells with internal value pointer set as NULL, and return a new List with this values removed
-    * Warning: This method Freeds the old List, so, be careful
+    * This method removes all Cells with internal value pointer set as NULL, and return a new List with these values removed
+    * Warning: This method Freed the old List, so, be careful
 
     * Other Details
     *   Time Complexity: O(n)
     *   For GNU C Compiler (GCC) Users: 'warn_unused_result' flag. Return can't be ignored
 */
-__attribute__((warn_unused_result)) struct LinkedList_t* DryNulls(struct LinkedList_t *list)
+__attribute__((warn_unused_result)) inline struct LinkedList_t* DryNulls(struct LinkedList_t *list)
 {
     struct __Aux_Counter counter = {.currentPosition = 0, .pivot = list->head};
     struct LinkedList_t *newList = (struct LinkedList_t *) malloc(sizeof(struct LinkedList_t)); 
@@ -476,7 +483,7 @@ __attribute__((warn_unused_result)) struct LinkedList_t* DryNulls(struct LinkedL
     *   Time Complexity: Θ(1)
     *   For GNU C Compiler (GCC) Users: 'warn_unused_result' flag. Return can't be ignored
 */
-__attribute__((warn_unused_result)) struct Cell_t* RetrieveFront(struct LinkedList_t *list)
+__attribute__((warn_unused_result)) inline struct Cell_t* RetrieveFront(struct LinkedList_t *list)
 {
     if (Empty(list)) {
         #if WARNINGS_ALLOWED
@@ -502,7 +509,7 @@ __attribute__((warn_unused_result)) struct Cell_t* RetrieveFront(struct LinkedLi
     *   Time Complexity: Θ(n)
     *   For GNU C Compiler (GCC) Users: 'warn_unused_result' flag. Return can't be ignored
 */
-__attribute__((warn_unused_result)) struct Cell_t* RetrieveBack(struct LinkedList_t *list)
+__attribute__((warn_unused_result)) inline struct Cell_t* RetrieveBack(struct LinkedList_t *list)
 {
     if (Empty(list)) {
         #if WARNINGS_ALLOWED
@@ -518,6 +525,8 @@ __attribute__((warn_unused_result)) struct Cell_t* RetrieveBack(struct LinkedLis
         counter.pivot = counter.pivot->next;
         ++counter.currentPosition;
     }
+
+    if (beforeTarget == NULL) return NULL;
 
     beforeTarget->next = NULL;
     counter.pivot->next = NULL;
